@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Role Management</h2>
+        {% if current_user.has_permission('create_roles') %}
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+            <i data-feather="plus"></i> Create Role
+        </button>
+        {% endif %}
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Permissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in roles %}
+                    <tr>
+                        <td>{{ role.name }}</td>
+                        <td>{{ role.description }}</td>
+                        <td>
+                            {% for permission in role.permissions %}
+                            <span class="badge bg-info">{{ permission.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if current_user.has_permission('edit_roles') %}
+                            <button class="btn btn-sm btn-warning">
+                                <i data-feather="edit"></i>
+                            </button>
+                            {% endif %}
+                            {% if current_user.has_permission('delete_roles') %}
+                            <button class="btn btn-sm btn-danger">
+                                <i data-feather="trash-2"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create Role Modal -->
+<div class="modal fade" id="createRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="roleForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Role Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>User Management</h2>
+        {% if current_user.has_permission('create_users') %}
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <i data-feather="plus"></i> Create User
+        </button>
+        {% endif %}
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% for role in user.roles %}
+                            <span class="badge bg-secondary">{{ role.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if current_user.has_permission('edit_users') %}
+                            <button class="btn btn-sm btn-warning" onclick="editUser({{ user.id }})">
+                                <i data-feather="edit"></i>
+                            </button>
+                            {% endif %}
+                            {% if current_user.has_permission('delete_users') %}
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser({{ user.id }})">
+                                <i data-feather="trash-2"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

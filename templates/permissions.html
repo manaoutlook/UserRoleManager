@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Permission Management</h2>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Roles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for permission in permissions %}
+                    <tr>
+                        <td>
+                            <span class="permission-indicator permission-granted"></span>
+                            {{ permission.name }}
+                        </td>
+                        <td>{{ permission.description }}</td>
+                        <td>
+                            {% for role in permission.roles %}
+                            <span class="badge bg-secondary">{{ role.name }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
