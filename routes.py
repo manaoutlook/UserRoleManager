@@ -33,12 +33,22 @@ def users():
 @login_required
 @require_permission('create_users')
 def create_user():
-    data = request.get_json()
-    user = User(username=data['username'], email=data['email'])
-    user.set_password(data['password'])
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        data = request.get_json()
+        # Check if user already exists
+        if User.query.filter_by(username=data['username']).first():
+            return jsonify({'success': False, 'error': 'Username already exists'}), 400
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'success': False, 'error': 'Email already exists'}), 400
+
+        user = User(username=data['username'], email=data['email'])
+        user.set_password(data['password'])
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'User created successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @main_bp.route('/users/<int:user_id>', methods=['PUT'])
 @login_required
