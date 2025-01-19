@@ -116,7 +116,35 @@ function updateUser(userId, formData) {
 }
 
 function deleteUser(userId) {
-    if (confirm('Are you sure you want to delete this user?')) {
+    // Create confirmation dialog
+    const confirmDialog = document.createElement('div');
+    confirmDialog.className = 'modal fade';
+    confirmDialog.id = 'confirmDeleteModal';
+    confirmDialog.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this user?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(confirmDialog);
+
+    const modal = new bootstrap.Modal(confirmDialog);
+    modal.show();
+
+    document.getElementById('confirmDelete').onclick = function() {
+        modal.hide();
         fetch(`/users/${userId}`, {
             method: 'DELETE'
         })
@@ -139,7 +167,12 @@ function deleteUser(userId) {
             messageElement.textContent = 'Error deleting user. Please try again.';
             messageElement.style.display = 'block';
         });
-    }
+
+        // Clean up the modal
+        confirmDialog.addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(confirmDialog);
+        });
+    };
 }
 
 // Role Management
@@ -239,6 +272,66 @@ function updateRole(roleId, formData) {
         messageElement.textContent = 'Error updating role. Please try again.';
         messageElement.style.display = 'block';
     });
+}
+
+function deleteRole(roleId) {
+    // Create confirmation dialog
+    const confirmDialog = document.createElement('div');
+    confirmDialog.className = 'modal fade';
+    confirmDialog.id = 'confirmDeleteModal';
+    confirmDialog.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this role?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(confirmDialog);
+
+    const modal = new bootstrap.Modal(confirmDialog);
+    modal.show();
+
+    document.getElementById('confirmDelete').onclick = function() {
+        modal.hide();
+        fetch(`/roles/${roleId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json().then(data => ({status: response.status, data})))
+        .then(({status, data}) => {
+            const messageElement = document.getElementById('messageAlert') || createMessageElement();
+            if (data.success) {
+                messageElement.className = 'alert alert-success';
+                messageElement.textContent = data.message || 'Role deleted successfully';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                messageElement.className = 'alert alert-danger';
+                messageElement.textContent = data.error || 'Error deleting role';
+            }
+            messageElement.style.display = 'block';
+        })
+        .catch(error => {
+            const messageElement = document.getElementById('messageAlert') || createMessageElement();
+            messageElement.className = 'alert alert-danger';
+            messageElement.textContent = 'Error deleting role. Please try again.';
+            messageElement.style.display = 'block';
+        });
+
+        // Clean up the modal
+        confirmDialog.addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(confirmDialog);
+        });
+    };
 }
 
 // Form handlers
