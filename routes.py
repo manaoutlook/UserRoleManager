@@ -19,13 +19,16 @@ def require_permission(permission_name):
 @main_bp.route('/')
 @login_required
 def index():
-    return render_template('users.html')
+    return render_template('dashboard.html')
 
 # Location routes
 @main_bp.route('/locations')
 @login_required
 @require_permission('view_locations')
 def locations():
+    if not current_user.has_permission('view_locations'):
+        flash('Permission denied', 'error')
+        return redirect(url_for('main.index'))
     locations = Location.query.all()
     return render_template('locations.html', locations=locations)
 

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Welcome to User Management System</h1>
+    <div class="row">
+        {% if current_user.has_permission('view_users') %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">User Management</h5>
+                    <p class="card-text">Manage system users, their roles and permissions.</p>
+                    <a href="{{ url_for('main.users') }}" class="btn btn-primary">Go to Users</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if current_user.has_permission('view_roles') %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Role Management</h5>
+                    <p class="card-text">Configure roles and their associated permissions.</p>
+                    <a href="{{ url_for('main.roles') }}" class="btn btn-primary">Go to Roles</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if current_user.has_permission('view_locations') %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Location Management</h5>
+                    <p class="card-text">Manage locations and their associated users.</p>
+                    <a href="{{ url_for('main.locations') }}" class="btn btn-primary">Go to Locations</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

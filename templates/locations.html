@@ -1,53 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2>Location Management</h2>
-        {% if current_user.has_permission('create_locations') %}
-        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createLocationModal">
-            <i data-feather="plus"></i> Create Location
-        </button>
-        {% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Location Management</h2>
+            {% if current_user.has_permission('create_locations') %}
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createLocationModal">
+                <i data-feather="plus"></i> Add New Location
+            </button>
+            {% endif %}
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>City</th>
-                        <th>State</th>
-                        <th>Country</th>
-                        <th>Postal Code</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for location in locations %}
-                    <tr>
-                        <td>{{ location.name }}</td>
-                        <td>{{ location.address }}</td>
-                        <td>{{ location.city }}</td>
-                        <td>{{ location.state }}</td>
-                        <td>{{ location.country }}</td>
-                        <td>{{ location.postal_code }}</td>
-                        <td>
-                            {% if current_user.has_permission('edit_locations') %}
-                            <button class="btn btn-sm btn-warning" onclick="editLocation({{ location.id }})">
-                                <i data-feather="edit"></i>
-                            </button>
-                            {% endif %}
-                            {% if current_user.has_permission('delete_locations') %}
-                            <button class="btn btn-sm btn-danger" onclick="deleteLocation({{ location.id }})">
-                                <i data-feather="trash-2"></i>
-                            </button>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>Postal Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for location in locations %}
+                        <tr>
+                            <td>{{ location.name }}</td>
+                            <td>{{ location.address }}</td>
+                            <td>{{ location.city }}</td>
+                            <td>{{ location.state }}</td>
+                            <td>{{ location.country }}</td>
+                            <td>{{ location.postal_code }}</td>
+                            <td>
+                                {% if current_user.has_permission('edit_locations') %}
+                                <button class="btn btn-sm btn-warning" onclick="editLocation({{ location.id }})">
+                                    <i data-feather="edit"></i>
+                                </button>
+                                {% endif %}
+                                {% if current_user.has_permission('delete_locations') %}
+                                <button class="btn btn-sm btn-danger" onclick="deleteLocation({{ location.id }})">
+                                    <i data-feather="trash-2"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -57,7 +59,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create Location</h5>
+                <h5 class="modal-title">Add New Location</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -86,7 +88,7 @@
                         <label for="postal_code" class="form-label">Postal Code</label>
                         <input type="text" class="form-control" id="postal_code" name="postal_code" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Create Location</button>
                 </form>
             </div>
         </div>
@@ -128,7 +130,7 @@
                         <label for="editPostalCode" class="form-label">Postal Code</label>
                         <input type="text" class="form-control" id="editPostalCode" name="postal_code" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="submit" class="btn btn-primary">Update Location</button>
                 </form>
             </div>
         </div>
