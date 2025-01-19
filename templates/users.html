@@ -87,6 +87,20 @@
                             {% endfor %}
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Locations</label>
+                        <div class="location-checkboxes">
+                            {% for location in locations %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="locations" 
+                                       value="{{ location.id }}" id="location_{{ location.id }}">
+                                <label class="form-check-label" for="location_{{ location.id }}">
+                                    {{ location.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary">Create</button>
                 </form>
             </div>
@@ -127,6 +141,20 @@
                                        value="{{ role.id }}" id="editRole_{{ role.id }}">
                                 <label class="form-check-label" for="editRole_{{ role.id }}">
                                     {{ role.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Locations</label>
+                        <div class="location-checkboxes">
+                            {% for location in locations %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="locations" 
+                                       value="{{ location.id }}" id="editLocation_{{ location.id }}">
+                                <label class="form-check-label" for="editLocation_{{ location.id }}">
+                                    {{ location.name }}
                                 </label>
                             </div>
                             {% endfor %}

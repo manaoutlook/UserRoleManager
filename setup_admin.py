@@ -13,21 +13,25 @@ def setup_admin():
             ('create_roles', 'Can create new roles'),
             ('edit_roles', 'Can edit existing roles'),
             ('delete_roles', 'Can delete roles'),
-            ('view_permissions', 'Can view permission list')
+            ('view_permissions', 'Can view permission list'),
+            ('view_locations', 'Can view location list'),
+            ('create_locations', 'Can create new locations'),
+            ('edit_locations', 'Can edit existing locations'),
+            ('delete_locations', 'Can delete locations')
         ]
 
         for name, description in permissions:
             if not Permission.query.filter_by(name=name).first():
                 permission = Permission(name=name, description=description)
                 db.session.add(permission)
-        
+
         # Create admin role with all permissions
         admin_role = Role.query.filter_by(name='admin').first()
         if not admin_role:
             admin_role = Role(name='admin', description='Administrator with full access')
             db.session.add(admin_role)
             db.session.flush()  # To get the role ID
-            
+
             # Add all permissions to admin role
             all_permissions = Permission.query.all()
             admin_role.permissions.extend(all_permissions)
