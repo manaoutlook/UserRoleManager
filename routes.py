@@ -78,17 +78,74 @@ def delete_user(user_id):
 @require_permission('view_roles')
 def roles():
     roles = Role.query.all()
-    return render_template('roles.html', roles=roles)
+    permissions = Permission.query.all()
+    return render_template('roles.html', roles=roles, permissions=permissions)
 
 @main_bp.route('/roles/create', methods=['POST'])
 @login_required
 @require_permission('create_roles')
 def create_role():
-    data = request.get_json()
-    role = Role(name=data['name'], description=data['description'])
-    db.session.add(role)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        data = request.get_json()
+
+        # Check if role already exists
+        if Role.query.filter_by(name=data['name']).first():
+            return jsonify({'success': False, 'error': 'Role name already exists'}), 400
+
+        role = Role(name=data['name'], description=data['description'])
+
+        # Add permissions
+        if 'permissions' in data:
+            permissions = Permission.query.filter(Permission.id.in_(data['permissions'])).all()
+            role.permissions.extend(permissions)
+
+        db.session.add(role)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Role created successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@main_bp.route('/roles/<int:role_id>', methods=['PUT'])
+@login_required
+@require_permission('edit_roles')
+def update_role(role_id):
+    try:
+        role = Role.query.get_or_404(role_id)
+        data = request.get_json()
+
+        # Check if new role name already exists (excluding current role)
+        existing_role = Role.query.filter(Role.name == data['name'], Role.id != role_id).first()
+        if existing_role:
+            return jsonify({'success': False, 'error': 'Role name already exists'}), 400
+
+        role.name = data['name']
+        role.description = data['description']
+
+        # Update permissions
+        if 'permissions' in data:
+            role.permissions = []  # Clear existing permissions
+            permissions = Permission.query.filter(Permission.id.in_(data['permissions'])).all()
+            role.permissions.extend(permissions)
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Role updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@main_bp.route('/roles/<int:role_id>', methods=['DELETE'])
+@login_required
+@require_permission('delete_roles')
+def delete_role(role_id):
+    try:
+        role = Role.query.get_or_404(role_id)
+        db.session.delete(role)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Role deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Permission routes
 @main_bp.route('/permissions')

@@ -9,7 +9,7 @@
             <i data-feather="plus"></i> Create Role
         </button>
         {% endif %}
-        
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -32,12 +32,12 @@
                         </td>
                         <td>
                             {% if current_user.has_permission('edit_roles') %}
-                            <button class="btn btn-sm btn-warning">
+                            <button class="btn btn-sm btn-warning" onclick="editRole({{ role.id }})">
                                 <i data-feather="edit"></i>
                             </button>
                             {% endif %}
                             {% if current_user.has_permission('delete_roles') %}
-                            <button class="btn btn-sm btn-danger">
+                            <button class="btn btn-sm btn-danger" onclick="deleteRole({{ role.id }})">
                                 <i data-feather="trash-2"></i>
                             </button>
                             {% endif %}
@@ -59,6 +59,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <!-- Alert message will be inserted here by JavaScript -->
                 <form id="roleForm">
                     <div class="mb-3">
                         <label for="name" class="form-label">Role Name</label>
@@ -67,6 +68,20 @@
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Permissions</label>
+                        <div class="permission-checkboxes">
+                            {% for permission in permissions %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="permissions" 
+                                       value="{{ permission.id }}" id="permission_{{ permission.id }}">
+                                <label class="form-check-label" for="permission_{{ permission.id }}">
+                                    {{ permission.name }} - {{ permission.description }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Create</button>
                 </form>

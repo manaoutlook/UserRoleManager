@@ -100,12 +100,23 @@ function deleteUser(userId) {
 
 // Role Management
 function createRole(formData) {
+    // Get selected permissions
+    const selectedPermissions = Array.from(document.querySelectorAll('input[name="permissions"]:checked'))
+        .map(checkbox => parseInt(checkbox.value));
+
+    // Create the request data
+    const data = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        permissions: selectedPermissions
+    };
+
     fetch('/roles/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(Object.fromEntries(formData))
+        body: JSON.stringify(data)
     })
     .then(response => response.json().then(data => ({status: response.status, data})))
     .then(({status, data}) => {
