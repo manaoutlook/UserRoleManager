@@ -20,34 +20,43 @@ def setup_admin():
             ('delete_locations', 'Can delete locations')
         ]
 
+        # Create all permissions if they don't exist
         for name, description in permissions:
-            if not Permission.query.filter_by(name=name).first():
+            permission = Permission.query.filter_by(name=name).first()
+            if not permission:
                 permission = Permission(name=name, description=description)
                 db.session.add(permission)
 
-        # Create admin role with all permissions
+        db.session.commit()
+
+        # Create or get admin role
         admin_role = Role.query.filter_by(name='admin').first()
         if not admin_role:
             admin_role = Role(name='admin', description='Administrator with full access')
             db.session.add(admin_role)
-            db.session.flush()  # To get the role ID
+            db.session.flush()
 
-            # Add all permissions to admin role
-            all_permissions = Permission.query.all()
-            admin_role.permissions.extend(all_permissions)
+        # Ensure admin role has all permissions
+        all_permissions = Permission.query.all()
+        existing_permissions = set(p.id for p in admin_role.permissions)
 
-        # Create admin user
+        for permission in all_permissions:
+            if permission.id not in existing_permissions:
+                admin_role.permissions.append(permission)
+
+        # Create admin user if it doesn't exist
         admin_user = User.query.filter_by(username='admin').first()
         if not admin_user:
             admin_user = User(username='admin', email='admin@example.com')
-            admin_user.set_password('admin123')  # Default password
+            admin_user.set_password('admin123')
             admin_user.roles.append(admin_role)
             db.session.add(admin_user)
 
         db.session.commit()
-        print("Admin user created successfully!")
+        print("Admin user and permissions have been updated successfully!")
         print("Username: admin")
         print("Password: admin123")
+        print("\nAll permissions have been added to the admin role.")
 
 if __name__ == '__main__':
     setup_admin()

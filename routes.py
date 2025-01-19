@@ -26,9 +26,6 @@ def index():
 @login_required
 @require_permission('view_locations')
 def locations():
-    if not current_user.has_permission('view_locations'):
-        flash('Permission denied', 'error')
-        return redirect(url_for('main.index'))
     locations = Location.query.all()
     return render_template('locations.html', locations=locations)
 
