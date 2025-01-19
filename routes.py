@@ -27,7 +27,19 @@ def index():
 @require_permission('view_users')
 def users():
     users = User.query.all()
-    return render_template('users.html', users=users)
+    roles = Role.query.all()
+    return render_template('users.html', users=users, roles=roles)
+
+@main_bp.route('/users/<int:user_id>')
+@login_required
+@require_permission('edit_users')
+def get_user(user_id):
+    user = User.query.get_or_404(user_id)
+    return jsonify({
+        'username': user.username,
+        'email': user.email,
+        'roles': [role.id for role in user.roles]
+    })
 
 @main_bp.route('/users/create', methods=['POST'])
 @login_required
@@ -43,6 +55,12 @@ def create_user():
 
         user = User(username=data['username'], email=data['email'])
         user.set_password(data['password'])
+
+        # Add roles if provided
+        if 'roles' in data:
+            roles = Role.query.filter(Role.id.in_(data['roles'])).all()
+            user.roles.extend(roles)
+
         db.session.add(user)
         db.session.commit()
         return jsonify({'success': True, 'message': 'User created successfully'})
@@ -54,23 +72,49 @@ def create_user():
 @login_required
 @require_permission('edit_users')
 def update_user(user_id):
-    user = User.query.get_or_404(user_id)
-    data = request.get_json()
-    user.username = data['username']
-    user.email = data['email']
-    if 'password' in data:
-        user.set_password(data['password'])
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        user = User.query.get_or_404(user_id)
+        data = request.get_json()
+
+        # Check if username already exists (excluding current user)
+        existing_user = User.query.filter(User.username == data['username'], User.id != user_id).first()
+        if existing_user:
+            return jsonify({'success': False, 'error': 'Username already exists'}), 400
+
+        # Check if email already exists (excluding current user)
+        existing_user = User.query.filter(User.email == data['email'], User.id != user_id).first()
+        if existing_user:
+            return jsonify({'success': False, 'error': 'Email already exists'}), 400
+
+        user.username = data['username']
+        user.email = data['email']
+        if 'password' in data and data['password']:
+            user.set_password(data['password'])
+
+        # Update roles if provided
+        if 'roles' in data:
+            user.roles = []  # Clear existing roles
+            roles = Role.query.filter(Role.id.in_(data['roles'])).all()
+            user.roles.extend(roles)
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'User updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @main_bp.route('/users/<int:user_id>', methods=['DELETE'])
 @login_required
 @require_permission('delete_users')
 def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        user = User.query.get_or_404(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'User deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Role routes
 @main_bp.route('/roles')
@@ -80,6 +124,17 @@ def roles():
     roles = Role.query.all()
     permissions = Permission.query.all()
     return render_template('roles.html', roles=roles, permissions=permissions)
+
+@main_bp.route('/roles/<int:role_id>')
+@login_required
+@require_permission('edit_roles')
+def get_role(role_id):
+    role = Role.query.get_or_404(role_id)
+    return jsonify({
+        'name': role.name,
+        'description': role.description,
+        'permissions': [permission.id for permission in role.permissions]
+    })
 
 @main_bp.route('/roles/create', methods=['POST'])
 @login_required

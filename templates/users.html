@@ -9,7 +9,7 @@
             <i data-feather="plus"></i> Create User
         </button>
         {% endif %}
-        
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -73,7 +73,66 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Roles</label>
+                        <div class="role-checkboxes">
+                            {% for role in roles %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="roles" 
+                                       value="{{ role.id }}" id="role_{{ role.id }}">
+                                <label class="form-check-label" for="role_{{ role.id }}">
+                                    {{ role.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Alert message will be inserted here by JavaScript -->
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId" name="userId">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" id="editPassword" name="password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Roles</label>
+                        <div class="role-checkboxes">
+                            {% for role in roles %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="roles" 
+                                       value="{{ role.id }}" id="editRole_{{ role.id }}">
+                                <label class="form-check-label" for="editRole_{{ role.id }}">
+                                    {{ role.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>
         </div>
